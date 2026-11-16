@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Візуалізація кімнати 3D — розрахунок площі стін</title>
+  <link rel="stylesheet" href="style.css?v=3" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="tabbar">
+    <button type="button" class="tab-btn active" data-tab="file">Файл</button>
+    <button type="button" class="tab-btn" data-tab="constructor">Конструктор</button>
+    <button type="button" class="tab-btn" data-tab="wire">Проводка</button>
+    <button type="button" class="tab-btn" data-tab="calc">Розрахунки</button>
+  </div>
+
+  <div id="tab-file" class="tab-panel active" data-tab="file">
+    <section class="block">
+      <h2>Проект</h2>
+      <button id="newProjectBtn">Новий проект</button>
+      <button id="importBtn" class="secondary">Імпортувати</button>
+      <div id="fileTools" hidden>
+        <button id="saveBtn">Зберегти у файл (JSON)</button>
+        <button id="overwriteBtn" class="secondary">Перезаписати відкритий файл (⌘S)</button>
+      </div>
+      <input type="file" id="importFile" accept=".json,application/json" hidden />
+      <p id="ioMsg" class="hint"></p>
+    </section>
+  </div>
+
+  <div id="tab-constructor" class="tab-panel" data-tab="constructor">
+    <aside id="panel">
+      <h1>Кімната 3D</h1>
+
+      <details class="acc" open>
+        <summary>Кімнати</summary>
+        <div class="acc-body">
+          <div class="field">
+            <label for="roomSelect">Активна кімната (редагується формами нижче)</label>
+            <select id="roomSelect"></select>
+          </div>
+          <button id="addRoomBtn" class="secondary">Додати кімнату</button>
+          <button id="delRoomBtn" class="secondary">Видалити кімнату</button>
+          <div class="field">
+            <label for="roomName">Назва</label>
+            <input type="text" id="roomName" value="Кімната 1" />
+          </div>
+          <div class="field">
+            <label for="roomWidth">Ширина (X)</label>
+            <input type="number" id="roomWidth" min="0.1" step="0.1" value="5" />
+          </div>
+          <div class="field">
+            <label for="roomLength">Довжина (Z)</label>
+            <input type="number" id="roomLength" min="0.1" step="0.1" value="4" />
+          </div>
+          <div class="field">
+            <label for="roomHeight">Висота (Y)</label>
+            <input type="number" id="roomHeight" min="0.1" step="0.1" value="2.7" />
+          </div>
+          <div class="field">
+            <label for="roomPosX">Позиція центру X (м)</label>
+            <input type="number" id="roomPosX" step="0.1" value="0" />
+          </div>
+          <div class="field">
+            <label for="roomPosZ">Позиція центру Z (м)</label>
+            <input type="number" id="roomPosZ" step="0.1" value="0" />
+          </div>
+          <div class="field">
+            <label for="roomFloor">Рівень підлоги (м, може відрізнятись)</label>
+            <input type="number" id="roomFloor" step="0.01" value="0" />
+          </div>
+          <div class="field">
+            <label>Товщина стін (м): півн. / півд. / сх. / зах.</label>
+            <div style="display:flex; gap:4px">
+              <input type="number" id="thickN" min="0.01" step="0.01" value="0.1" />
+              <input type="number" id="thickS" min="0.01" step="0.01" value="0.1" />
+              <input type="number" id="thickE" min="0.01" step="0.01" value="0.1" />
+              <input type="number" id="thickW" min="0.01" step="0.01" value="0.1" />
+            </div>
+          </div>
+          <div class="field checkbox">
+            <label for="showCeiling">
+              <input type="checkbox" id="showCeiling" /> Показати стелю
+            </label>
+          </div>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary>Відображення</summary>
+        <div class="acc-body">
+          <div class="field">
+            <label for="gridStep">Крок сітки (м)</label>
+            <input type="number" id="gridStep" min="0.05" step="0.05" value="0.5" />
+          </div>
+          <div class="field checkbox">
+            <label for="showWallGrid">
+              <input type="checkbox" id="showWallGrid" checked /> Показати сітку на стінах
+            </label>
+          </div>
+          <div class="field checkbox">
+            <label for="showDoorLabels">
+              <input type="checkbox" id="showDoorLabels" /> Назви обʼєктів
+            </label>
+          </div>
+          <div class="field checkbox">
+            <label for="showDims">
+              <input type="checkbox" id="showDims" /> Показати розміри
+            </label>
+          </div>
+          <div class="field checkbox">
+            <label for="showDoorRuler">
+              <input type="checkbox" id="showDoorRuler" /> Лінійка дверей від країв
+            </label>
+          </div>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary>Матеріали</summary>
+        <div class="acc-body">
+          <div class="field">
+            <label for="wallColor">Колір стін</label>
+            <input type="color" id="wallColor" value="#93c5fd" />
+          </div>
+          <div class="field checkbox">
+            <label for="wallOpaque">
+              <input type="checkbox" id="wallOpaque" /> Оригінальний колір стін (без прозорості)
+            </label>
+          </div>
+          <div class="field">
+            <label for="wallImageFile">Фон стін (зображення)</label>
+            <input type="file" id="wallImageFile" accept="image/*" />
+            <button id="wallImageClear" class="tiny">Прибрати фон стін</button>
+          </div>
+          <div class="field">
+            <label for="floorColor">Колір підлоги</label>
+            <input type="color" id="floorColor" value="#475569" />
+          </div>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary id="doorFormTitle">Двері</summary>
+        <div class="acc-body">
+          <div class="field">
+            <label for="doorType">Тип</label>
+            <select id="doorType">
+              <option value="door">Двері</option>
+              <option value="arch">Арка</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="doorWall">Стіна</label>
+            <select id="doorWall">
+              <option value="north">Північна (north)</option>
+              <option value="south">Південна (south)</option>
+              <option value="east">Східна (east)</option>
+              <option value="west">Західна (west)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="doorSide">Відлік зсуву</label>
+            <select id="doorSide">
+              <option value="left">Від лівого кута</option>
+              <option value="right">Від правого кута</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="doorOffset">Зсув (м)</label>
+            <input type="number" id="doorOffset" min="0" step="0.1" value="1" />
+          </div>
+          <div class="field">
+            <label for="doorWidth">Ширина дверей (м)</label>
+            <input type="number" id="doorWidth" min="0.1" step="0.1" value="0.9" />
+          </div>
+          <div class="field">
+            <label for="doorHeight">Висота дверей (м)</label>
+            <input type="number" id="doorHeight" min="0.1" step="0.1" value="2.1" />
+          </div>
+          <div class="field">
+            <label for="doorColor">Колір дверей</label>
+            <input type="color" id="doorColor" value="#ff8c00" />
+          </div>
+          <div class="field">
+            <label for="doorImageFile">Фон дверей (зображення)</label>
+            <input type="file" id="doorImageFile" accept="image/*" />
+            <button id="doorImageClear" class="tiny">Прибрати фон дверей</button>
+          </div>
+          <div class="field">
+            <label for="doorReveal">Відкоси — глибина назовні (м, 0 — без)</label>
+            <input type="number" id="doorReveal" min="0" step="0.05" value="0" />
+          </div>
+          <div class="field">
+            <label for="doorThreshold">Поріг — висота (м, 0 — без порога)</label>
+            <input type="number" id="doorThreshold" min="0" step="0.01" value="0" />
+          </div>
+          <div class="field" id="doorCasingField">
+            <label for="doorCasing">Ширина лиштви (м, 0 — без лиштви)</label>
+            <input type="number" id="doorCasing" min="0" step="0.01" value="0.07" />
+          </div>
+          <div class="field" id="doorCasingColorField">
+            <label for="doorCasingColor">Колір лиштви</label>
+            <input type="color" id="doorCasingColor" value="#ff8c00" />
+          </div>
+          <div class="field" id="doorRadiusField" hidden>
+            <label for="doorRadius">Заокруглення верху (м, 0 — квадратна)</label>
+            <input type="number" id="doorRadius" min="0" step="0.05" value="0" />
+          </div>
+          <div id="doorOpenGroup">
+            <div class="field">
+              <label for="doorHinge">Петлі (сторона відчинення)</label>
+              <select id="doorHinge">
+                <option value="left">Зліва</option>
+                <option value="right">Справа</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="doorOpenDir">Напрямок відчинення</label>
+              <select id="doorOpenDir">
+                <option value="in">Всередину</option>
+                <option value="out">Назовні</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="doorOpenAngle">Кут відчинення (°)</label>
+              <input type="number" id="doorOpenAngle" min="0" max="120" step="5" value="90" />
+            </div>
+            <div class="field">
+              <label for="doorInset">Положення у відкосі (м від внутрішньої грані)</label>
+              <input type="number" id="doorInset" min="0" step="0.02" value="0" />
+            </div>
+          </div>
+          <button id="addDoorBtn">Додати двері</button>
+          <button id="cancelEditBtn" class="secondary" hidden>Відхилити</button>
+          <p id="doorError" class="error" role="alert"></p>
+          <ul id="doorList"></ul>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary id="elemFormTitle">Електрика</summary>
+        <div class="acc-body">
+          <div class="field">
+            <label for="elemType">Тип</label>
+            <select id="elemType">
+              <option value="socket">Розетка</option>
+              <option value="socket2">Розетка подвійна</option>
+              <option value="socket3">Розетка потрійна</option>
+              <option value="switch">Вимикач</option>
+              <option value="switch2">Вимикач подвійний</option>
+              <option value="switch3">Вимикач потрійний</option>
+              <option value="combo">Комбінований (розетка + вимикач)</option>
+              <option value="wireout">Вивід проводки (під інтерʼєр)</option>
+              <option value="panel">Електрощиток</option>
+              <option value="junction">Розподільча коробка</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="elemWall">Стіна</label>
+            <select id="elemWall">
+              <option value="north">Північна (north)</option>
+              <option value="south">Південна (south)</option>
+              <option value="east">Східна (east)</option>
+              <option value="west">Західна (west)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="elemSide">Відлік зсуву</label>
+            <select id="elemSide">
+              <option value="left">Від лівого кута</option>
+              <option value="right">Від правого кута</option>
+            </select>
+          </div>
+          <div class="field" id="elemSizeRow" hidden>
+            <label for="elemWidth">Ширина щитка (м)</label>
+            <input type="number" id="elemWidth" min="0.05" step="0.01" value="0.32" />
+            <label for="elemHeight" style="margin-top:6px">Висота щитка (м)</label>
+            <input type="number" id="elemHeight" min="0.05" step="0.01" value="0.5" />
+          </div>
+          <div class="field">
+            <label for="elemOffset">Зсув (м)</label>
+            <input type="number" id="elemOffset" min="0" step="0.05" value="0.5" />
+          </div>
+          <div class="field">
+            <label for="elemElevation">Висота від підлоги (м)</label>
+            <input type="number" id="elemElevation" min="0" step="0.05" value="0.3" />
+          </div>
+          <button id="addElemBtn">Додати елемент</button>
+          <button id="cancelElemBtn" class="secondary" hidden>Відхилити</button>
+          <p id="elemError" class="error" role="alert"></p>
+          <ul id="elemList"></ul>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary>Світильники</summary>
+        <div class="acc-body">
+          <div class="field">
+            <label for="lightMount">Кріплення</label>
+            <select id="lightMount">
+              <option value="ceiling">Стеля</option>
+              <option value="wall">Стіна</option>
+            </select>
+          </div>
+          <div id="lightCeilingFields">
+            <div class="field">
+              <label for="lightX">X від лівого краю (м)</label>
+              <input type="number" id="lightX" min="0" step="0.1" value="2.5" />
+            </div>
+            <div class="field">
+              <label for="lightZ">Z від переднього краю (м)</label>
+              <input type="number" id="lightZ" min="0" step="0.1" value="2" />
+            </div>
+          </div>
+          <div id="lightWallFields" hidden>
+            <div class="field">
+              <label for="lightWall">Стіна</label>
+              <select id="lightWall">
+                <option value="north">Північна (north)</option>
+                <option value="south">Південна (south)</option>
+                <option value="east">Східна (east)</option>
+                <option value="west">Західна (west)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="lightSide">Відлік зсуву</label>
+              <select id="lightSide">
+                <option value="left">Від лівого кута</option>
+                <option value="right">Від правого кута</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="lightOffset">Зсув (м)</label>
+              <input type="number" id="lightOffset" min="0" step="0.05" value="1" />
+            </div>
+            <div class="field">
+              <label for="lightElevation">Висота від підлоги (м)</label>
+              <input type="number" id="lightElevation" min="0" step="0.05" value="2" />
+            </div>
+          </div>
+          <button id="addLightBtn">Додати світильник</button>
+          <p id="lightError" class="error" role="alert"></p>
+          <ul id="lightList"></ul>
+        </div>
+      </details>
+
+      <details class="acc">
+        <summary id="objFormTitle">Предмети на стіні</summary>
+        <div class="acc-body">
+          <div class="field">
+            <label for="objType">Тип</label>
+            <select id="objType">
+              <option value="picture">Картина</option>
+              <option value="mirror">Дзеркало</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="objWall">Стіна</label>
+            <select id="objWall">
+              <option value="north">Північна (north)</option>
+              <option value="south">Південна (south)</option>
+              <option value="east">Східна (east)</option>
+              <option value="west">Західна (west)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="objSide">Відлік зсуву</label>
+            <select id="objSide">
+              <option value="left">Від лівого кута</option>
+              <option value="right">Від правого кута</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="objOffset">Зсув (м, до центру)</label>
+            <input type="number" id="objOffset" min="0" step="0.05" value="1.5" />
+          </div>
+          <div class="field">
+            <label for="objElevation">Висота центру від підлоги (м)</label>
+            <input type="number" id="objElevation" min="0" step="0.05" value="1.5" />
+          </div>
+          <div class="field">
+            <label for="objWidth">Ширина (м)</label>
+            <input type="number" id="objWidth" min="0.05" step="0.05" value="0.6" />
+          </div>
+          <div class="field">
+            <label for="objHeight">Висота (м)</label>
+            <input type="number" id="objHeight" min="0.05" step="0.05" value="0.8" />
+          </div>
+          <div class="field" id="objColorField">
+            <label for="objColor">Колір рамки</label>
+            <input type="color" id="objColor" value="#8b5a2b" />
+          </div>
+          <div class="field" id="objImageField">
+            <label for="objImageFile">Зображення (для картини)</label>
+            <input type="file" id="objImageFile" accept="image/*" />
+            <button id="objImageClear" class="tiny">Прибрати зображення</button>
+          </div>
+          <button id="addObjBtn">Додати предмет</button>
+          <button id="cancelObjBtn" class="secondary" hidden>Відхилити</button>
+          <p id="objError" class="error" role="alert"></p>
+          <ul id="objList"></ul>
+        </div>
+      </details>
+    </aside>
+
+    <div class="canvas-host"></div>
+  </div>
+
+  <div id="tab-wire" class="tab-panel" data-tab="wire">
+    <aside id="wirePanel">
+      <h1>Проводка</h1>
+      <section class="block">
+        <h2>Режим маршруту</h2>
+        <p class="hint">Маршрути завжди ортогональні: повороти строго під 90°, по стінах та стелі.</p>
+        <div class="field checkbox">
+          <label for="wireCeiling">
+            <input type="checkbox" id="wireCeiling" /> Нові проводи — через стелю
+          </label>
+        </div>
+      </section>
+
+      <section class="block">
+        <h2>Інструмент</h2>
+        <div id="cpChip" class="palette-item">＋ Контрольна точка</div>
+        <p class="hint">Перетягніть на провід у 3D, щоб додати контрольну точку. Точки можна тягнути (у т.ч. на стелю); подвійний клік — видалити.</p>
+      </section>
+
+      <section class="block">
+        <h2>Додати провід</h2>
+        <div class="field">
+          <label for="wireFrom">Від</label>
+          <select id="wireFrom"></select>
+        </div>
+        <div class="field">
+          <label for="wireTo">До</label>
+          <select id="wireTo"></select>
+        </div>
+        <div class="field">
+          <label for="wireCable">Тип кабелю</label>
+          <select id="wireCable">
+            <option value="power">Мережевий (живлення)</option>
+            <option value="utp">Вита пара (UTP)</option>
+            <option value="fiber">Оптоволокно</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="wireCores">Кількість жил</label>
+          <input type="number" id="wireCores" min="1" step="1" value="3" />
+        </div>
+        <div class="field">
+          <label for="wireDiam">Діаметр (мм)</label>
+          <input type="number" id="wireDiam" min="0.1" step="0.1" value="6" />
+        </div>
+        <button id="addWireBtn">Додати провід</button>
+        <p id="wireError" class="error" role="alert"></p>
+        <ul id="wireList"></ul>
+      </section>
+    </aside>
+
+    <div class="canvas-host"></div>
+  </div>
+
+  <div id="tab-calc" class="tab-panel" data-tab="calc">
+    <section class="block">
+      <h2>Результати</h2>
+      <div id="results"></div>
+    </section>
+
+    <div id="calcTabContent">
+      <section class="block">
+        <h2>Гіпсокартон</h2>
+        <p class="calc-intro">Розрахунок кількості листів гіпсокартону на стіни та/або стелю з урахуванням відходів.</p>
+        <div class="field checkbox">
+          <label for="calcGkStene">
+            <input type="checkbox" id="calcGkStene" checked /> Рахувати стіни
+          </label>
+        </div>
+        <div class="field checkbox">
+          <label for="calcGkCeiling">
+            <input type="checkbox" id="calcGkCeiling" /> Рахувати стелю
+          </label>
+        </div>
+        <div class="field">
+          <label for="gkSheetW">Ширина листа (м)</label>
+          <input type="number" id="gkSheetW" min="0.1" step="0.1" value="1.2" />
+        </div>
+        <div class="field">
+          <label for="gkSheetH">Висота листа (м)</label>
+          <input type="number" id="gkSheetH" min="0.1" step="0.1" value="2.5" />
+        </div>
+        <div class="field">
+          <label for="gkWaste">Відходи (%)</label>
+          <input type="number" id="gkWaste" min="0" step="1" value="10" />
+        </div>
+        <div id="gkResults"></div>
+      </section>
+
+      <section class="block">
+        <h2>Рейки на стелю (профілі)</h2>
+        <p class="calc-intro">Каркас підвісної стелі з ГКЛ над площею кімнати (UD, CD, підвіси, краби).</p>
+        <div class="field">
+          <label for="railStep">Крок несучого профілю CD (м)</label>
+          <input type="number" id="railStep" min="0.1" step="0.05" value="0.6" />
+        </div>
+        <div class="field">
+          <label for="railStock">Довжина профілю в закупівлі (м)</label>
+          <input type="number" id="railStock" min="0.5" step="0.5" value="3" />
+        </div>
+        <div id="railResults"></div>
+      </section>
+
+      <section class="block">
+        <h2>Плінтуси</h2>
+        <p class="calc-intro">Підлоговий і стельовий плінтус за периметром кімнати. У підлоговому дверні/аркові прорізи віднімаються.</p>
+        <div class="field checkbox">
+          <label for="plinthFloor">
+            <input type="checkbox" id="plinthFloor" checked /> Підлоговий плінтус
+          </label>
+        </div>
+        <div class="field checkbox">
+          <label for="plinthCeiling">
+            <input type="checkbox" id="plinthCeiling" checked /> Стельовий плінтус
+          </label>
+        </div>
+        <div class="field">
+          <label for="plinthPiece">Довжина планки (м)</label>
+          <input type="number" id="plinthPiece" min="0.5" step="0.1" value="2.5" />
+        </div>
+        <div class="field">
+          <label for="plinthWaste">Запас/відходи (%)</label>
+          <input type="number" id="plinthWaste" min="0" step="1" value="5" />
+        </div>
+        <div id="plinthResults"></div>
+      </section>
+
+      <section class="block">
+        <h2>Детальна довжина проводки</h2>
+        <p class="calc-intro">Довжина кожного проводу за фактичним маршрутом (по стіні / по стелі) із запасом на підключення.</p>
+        <div class="field">
+          <label for="wireSlack">Запас на підключення (%)</label>
+          <input type="number" id="wireSlack" min="0" step="1" value="15" />
+        </div>
+        <div id="wireCalcResults"></div>
+      </section>
+
+      <section class="block">
+        <h2>Розкладка гіпсокартону (розкрій)</h2>
+        <p class="calc-intro">Автоматична розкладка плит ГКЛ по стінах/стелі з нумерацією та розмірами розрізаних плит. Обирає найкращий шаблон (менше плит). Розмір плити береться з блоку «Гіпсокартон» вище.</p>
+        <div class="field checkbox">
+          <label for="showDrywall">
+            <input type="checkbox" id="showDrywall" /> Показати розкладку на моделі
+          </label>
+        </div>
+        <div class="field">
+          <label for="dwOrient">Орієнтація плит</label>
+          <select id="dwOrient">
+            <option value="auto">Авто (найкращий шаблон)</option>
+            <option value="h">Горизонтально</option>
+            <option value="v">Вертикально</option>
+            <option value="econ">Економія (мінімум відходів, дрібні шматки)</option>
+          </select>
+        </div>
+        <div class="field checkbox">
+          <label for="dwStagger">
+            <input type="checkbox" id="dwStagger" checked /> Шаховий порядок (зі зсувом швів)
+          </label>
+        </div>
+        <div class="field checkbox">
+          <label for="useLeftovers">
+            <input type="checkbox" id="useLeftovers" checked /> Використати залишки на стінах (економія плит)
+          </label>
+        </div>
+        <div class="field checkbox">
+          <label for="showLeftovers">
+            <input type="checkbox" id="showLeftovers" checked /> Показувати залишки біля кімнати
+          </label>
+        </div>
+        <div id="dwResults"></div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Single WebGL canvas, moved into the active 3D tab's .canvas-host by JS -->
+  <div id="canvas-holder" hidden>
+    <div id="canvas-wrap">
+      <div id="modebar">
+        <button type="button" class="mode-btn active" data-mode="orbit">Огляд</button>
+        <button type="button" class="mode-btn" data-mode="move">Перемістити</button>
+        <button type="button" class="mode-btn" data-mode="wire">Проводка</button>
+        <span id="modeHint"></span>
+      </div>
+      <canvas id="scene"></canvas>
+    </div>
+  </div>
+
+  <script type="module" src="app.js?v=2"></script>
+</body>
+</html>

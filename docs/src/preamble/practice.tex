@@ -1,0 +1,77 @@
+% ============================================================
+%  Макроси звіту з передкваліфікаційної практики
+% ============================================================
+
+% У звіті гіперпосилання не виділяються рамками
+\hypersetup{hidelinks}
+
+% Титульна сторінка звіту з практики
+% #1 - Міністерство
+% #2 - Університет
+% #3 - Кафедра
+% #4 - База практики
+% #5 - Тема кваліфікаційної роботи
+% #6 - Група
+% #7 - Студент
+% #8 - Керівник практики від кафедри
+% #9 - Науковий керівник кваліфікаційної роботи
+\newcommand{\makepracticetitlepage}[9]{%
+    \begin{titlepage}
+    \thispagestyle{empty}
+    \begin{spacing}{1.2}
+    \begin{center}
+    \MakeUppercase{\textbf{#1}}\\[0.5em] \textbf{#2}\\[1em] \textbf{#3}\\[4em]
+    \MakeUppercase{\textbf{ЗВІТ}}\\[0.3em] про проходження передкваліфікаційної практики\\[1.2em]
+    База практики: #4\\[1.2em]
+    за темою кваліфікаційної роботи:\\[0.3em] «#5»
+    \end{center}
+    \vfill\noindent\hfill
+    \begin{tabular}{@{}l@{}}
+        Виконав студент ННІКІТІ: \\ групи: #6 \\ #7 \\[1.2em]
+        Керівник практики від кафедри: \\ #8 \\[1.2em]
+        Науковий керівник: \\ #9
+    \end{tabular}
+    \vspace{2em}\begin{center} Рівне – 2026 \end{center}
+    \end{spacing}
+    \end{titlepage}
+}
+
+% Сторінка вступної частини, яка не потрапляє до змісту
+% (індивідуальне завдання, календарний план тощо)
+\newcommand{\frontsection}[1]{%
+    \clearpage
+    \begin{center}\textbf{\MakeUppercase{#1}}\end{center}
+    \vspace{1em}
+}
+
+% Заголовок окремого додатка (потрапляє до змісту)
+\newcommand{\appendixpart}[2][]{%
+    \clearpage\phantomsection\label{#1}%
+    \addcontentsline{toc}{subsection}{#2}
+    \begin{center}\textbf{#2}\end{center}
+    \vspace{1em}
+}
+
+% Блок промту до ШІ-асистента (для додатків)
+% #1 - підпис або призначення промту
+\newenvironment{promptblock}[1]{%
+    \par\vspace{0.6em}\noindent\textit{#1}\par\nopagebreak\vspace{0.3em}
+    \begingroup\setstretch{1.0}\ttfamily\fontsize{11pt}{13.5pt}\selectfont
+    \begin{list}{}{%
+        \setlength{\leftmargin}{1cm}\setlength{\rightmargin}{0.5cm}%
+        \setlength{\itemindent}{0pt}\setlength{\listparindent}{0pt}%
+        \setlength{\topsep}{0pt}\setlength{\parsep}{0.4em}\setlength{\itemsep}{0pt}}
+    \item[]
+}{%
+    \end{list}\endgroup\par\vspace{0.6em}
+}
+
+% Підписи виконавця та керівника
+% #1 - підпис лівої колонки, #2 - ПІБ, #3 - підпис правої колонки, #4 - ПІБ
+\newcommand{\signatureline}[4]{%
+    \noindent
+    \begin{tabular}{@{}p{7.5cm}@{\hspace{1cm}}p{7.5cm}@{}}
+        #1 & #3 \\[2em]
+        \rule{3cm}{0.4pt}~#2 & \rule{3cm}{0.4pt}~#4 \\
+    \end{tabular}
+}

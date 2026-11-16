@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --check app.js)",
+      "Bash(python3 -m http.server 8000)",
+      "Bash(curl -s -o /dev/null -w \"index: %{http_code}\\\\n\" http://localhost:8000/)",
+      "Bash(curl -s -o /dev/null -w \"app.js: %{http_code}\\\\n\" http://localhost:8000/app.js)",
+      "Bash(curl -s -o /dev/null -w \"style.css: %{http_code}\\\\n\" http://localhost:8000/style.css)",
+      "Bash(kill %1)",
+      "Bash(pkill -f \"http.server 8000\")",
+      "Bash(kill 13226)",
+      "Bash(lsof -ti:8000)",
+      "Bash(xargs kill -9)",
+      "Bash(perl -0pi -e 's/hidden>Скасувати редагування/hidden>Відхилити/g' index.html)",
+      "Bash(echo \"=== app.js top \\(imports\\) ===\" && head -3 app.js && echo \"\" && echo \"=== IDE local history? ===\" && ls -la .idea/ 2>/dev/null | head && find ~ -path '*LocalHistory*' -name '*.xml' 2>/dev/null | head -3 && echo \"\" && echo \"=== any backup/orphaned index files ===\" && find . -name '*.html' -not -path '*/node_modules/*' 2>/dev/null && git stash list 2>&1 && git reflog 2>&1 | head -5)",
+      "Bash(grep -n \"const casing = type === 'arch'\\\\|els.doorCasing.value = door.casing\\\\|const color = hexToNum\\(els.doorColor.value\\)\\\\|return { type, wall, side, offset, width: dWidth\" app.js)",
+      "Bash(perl -0pi -e 's/#doorList/:is\\(#doorList,#elemList,#wireList,#lightList,#objList\\)/g' style.css)",
+      "Bash(grep -n \"lights: state.lights.map\\\\|const ids = new Set\\(state.elements.map\\\\|state.lights.push\\({ id, mount:\" app.js)",
+      "Bash(grep -n \"state.lights.push\\({ id, mount: 'ceiling', x, z }\\);\" app.js)",
+      "Bash(curl -s http://localhost:8000/ -o /dev/null -w \"%{http_code}\\\\n\")",
+      "Bash(curl -s \"http://localhost:8000/app.js\")",
+      "Bash(node --check /dev/stdin)",
+      "Bash(node --check js/drywall.js)",
+      "Bash(node --check js/utils.js)",
+      "Bash(node --input-type=module -e ' *)",
+      "Bash(node --check /Users/ddima/Desktop/square/app.js)",
+      "Bash(node --experimental-vm-modules --input-type=module -e ' *)"
+    ]
+  }
+}

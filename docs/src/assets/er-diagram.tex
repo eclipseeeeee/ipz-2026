@@ -1,0 +1,35 @@
+% Концептуальна модель даних проєкту.
+% Фрагмент вбудовується в звіт командою \settikz; окремо не компілюється.
+\tikzset{
+    ent/.style={
+        draw, thick, rectangle split, rectangle split parts=2, font=\scriptsize,
+        text width=3.6cm, align=left, inner sep=3pt, fill=black!3
+    },
+    rel/.style={semithick},
+    card/.style={font=\tiny, fill=white, inner sep=1pt}
+}
+\begin{tikzpicture}
+\node[ent] (proj) at (0,0) {\textbf{Project (JSON v2)}\nodepart{second}app, version\\activeRoom\\room: параметри відображення\\та розкладки ГКЛ};
+\node[ent] (room) at (6.6,0) {\textbf{Room}\nodepart{second}id (PK), name\\x, z, width, length\\height, floor\\thickness: N, S, E, W};
+
+\node[ent] (door) at (0,-4.9) {\textbf{Door}\nodepart{second}type: door або arch\\room (FK), wall, side\\offset, width, height\\reveal, threshold, casing\\radius, hinge, openDir\\openAngle, color, image};
+\node[ent] (obj)  at (4.4,-4.9) {\textbf{WallObject}\nodepart{second}type: picture або mirror\\room (FK), wall, side\\offset, elevation\\width, height\\color, image};
+\node[ent] (elem) at (8.8,-4.9) {\textbf{Element}\nodepart{second}id (PK), type\\room (FK), wall, side\\offset, elevation\\w, h (для щитка)};
+\node[ent] (lght) at (13.2,-4.9) {\textbf{Light}\nodepart{second}id (PK), mount\\room (FK)\\x, z або wall, side\\offset, elevation};
+
+\node[ent] (wire) at (11.0,-9.6) {\textbf{Wire}\nodepart{second}id (PK)\\from (FK), to (FK)\\ceiling, cable\\cores, diam, lane\\points: вільні або вузли};
+
+\draw[rel] (proj) -- (room) node[card, pos=0.1, above] {1} node[card, pos=0.9, above] {1..*};
+\draw[rel] (room.south) -- (door.north)
+    node[card, pos=0.08, left] {1} node[card, pos=0.92, left] {0..*};
+\draw[rel] (room.south) -- (obj.north)
+    node[card, pos=0.08, left] {1} node[card, pos=0.92, left] {0..*};
+\draw[rel] (room.south) -- (elem.north)
+    node[card, pos=0.08, right] {1} node[card, pos=0.92, right] {0..*};
+\draw[rel] (room.south) -- (lght.north)
+    node[card, pos=0.08, right] {1} node[card, pos=0.92, right] {0..*};
+\draw[rel] (elem.south) -- (wire.north west)
+    node[card, pos=0.1, left] {1} node[card, pos=0.9, left] {0..*};
+\draw[rel] (lght.south) -- (wire.north east)
+    node[card, pos=0.1, right] {1} node[card, pos=0.9, right] {0..*};
+\end{tikzpicture}

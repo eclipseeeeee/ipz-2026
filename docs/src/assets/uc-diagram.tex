@@ -1,0 +1,57 @@
+% Діаграма варіантів використання (UML Use Case).
+% Фрагмент вбудовується в звіт командою \settikz; окремо не компілюється.
+\tikzset{
+    uc/.style={
+        draw, thick, ellipse, align=center, font=\footnotesize,
+        minimum width=6.0cm, minimum height=1.0cm, inner sep=1pt
+    },
+    boundary/.style={draw, thick, rounded corners=2pt},
+    assoc/.style={semithick},
+    dep/.style={semithick, dashed, -{Latex[length=2.2mm]}},
+    stereo/.style={font=\scriptsize\itshape, inner sep=1pt, fill=white},
+    alabel/.style={font=\scriptsize, align=center},
+    actor/.pic={
+        \draw[semithick] (0,0) circle (0.19);
+        \draw[semithick] (0,-0.19) -- (0,-0.78);
+        \draw[semithick] (-0.32,-0.40) -- (0.32,-0.40);
+        \draw[semithick] (0,-0.78) -- (-0.27,-1.22);
+        \draw[semithick] (0,-0.78) -- (0.27,-1.22);
+    }
+}
+\begin{tikzpicture}[x=1cm, y=1cm]
+
+\draw[boundary] (4.20,0.55) rectangle (11.70,-14.55);
+\node[font=\small\bfseries, align=center] at (7.95,-0.15)
+     {Вебзастосунок моделювання приміщень\\і розрахунку матеріалів};
+
+\node[uc] (u1) at (7.95,-1.70)  {Створити / імпортувати проєкт};
+\node[uc] (u2) at (7.95,-3.20)  {Задати кімнати, двері та арки};
+\node[uc] (u3) at (7.95,-4.70)  {Розмістити електрообладнання};
+\node[uc] (u4) at (7.95,-6.20)  {Прокласти проводку};
+\node[uc] (u5) at (7.95,-7.70)  {Переглянути 3D-модель};
+\node[uc] (u6) at (7.95,-9.20)  {Розрахувати матеріали};
+\node[uc] (u7) at (7.95,-10.70) {Побудувати розкрій ГКЛ};
+\node[uc] (u8) at (7.95,-12.20) {Зберегти проєкт у JSON};
+\node[uc] (u9) at (7.95,-13.70) {Скасувати дію};
+
+\draw[dep] (u7.north) -- (u6.south);
+\node[stereo, anchor=west] at (8.10,-9.95) {$\ll$extend$\gg$};
+
+% ліва дійова особа
+\pic at (1.70,-5.00) {actor};
+\node[alabel] at (1.70,-6.70) {Проєктувальник /\\виконроб};
+\draw[assoc] (2.05,-5.40) -- (u1.west);
+\draw[assoc] (2.05,-5.40) -- (u2.west);
+\draw[assoc] (2.05,-5.40) -- (u3.west);
+\draw[assoc] (2.05,-5.40) -- (u4.west);
+\draw[assoc] (2.05,-5.40) -- (u8.west);
+\draw[assoc] (2.05,-5.40) -- (u9.west);
+
+% права дійова особа
+\pic at (14.20,-8.60) {actor};
+\node[alabel] at (14.20,-10.30) {Власник\\житла};
+\draw[assoc] (13.85,-9.00) -- (u5.east);
+\draw[assoc] (13.85,-9.00) -- (u6.east);
+\draw[assoc] (13.85,-9.00) -- (u7.east);
+
+\end{tikzpicture}

@@ -1,0 +1,47 @@
+% Діаграма C4, рівень 2 (контейнери).
+% Фрагмент вбудовується в звіт командою \settikz; окремо не компілюється.
+\tikzset{
+    cont/.style={
+        draw, thick, rounded corners=3pt, align=center, font=\scriptsize,
+        text width=3.8cm, minimum height=1.55cm, inner sep=4pt, fill=black!3
+    },
+    ext/.style={
+        draw, thick, dashed, rounded corners=3pt, align=center, font=\scriptsize,
+        text width=3.8cm, minimum height=1.15cm, inner sep=4pt, fill=black!8
+    },
+    store/.style={
+        draw, thick, align=center, font=\scriptsize,
+        text width=3.8cm, minimum height=1.25cm, inner sep=4pt, fill=black!6
+    },
+    boundary/.style={draw, thick, dash pattern=on 3pt off 2pt, rounded corners=3pt},
+    flow/.style={semithick, -{Latex[length=2.2mm]}},
+    biflow/.style={semithick, {Latex[length=2.2mm]}-{Latex[length=2.2mm]}},
+    lbl/.style={font=\tiny\itshape, fill=white, inner sep=1.2pt}
+}
+\begin{tikzpicture}[x=1cm, y=1cm]
+
+\node[ext] (user) at (3.0,0)  {\textbf{Користувач}\\проєктувальник, виконроб, власник житла};
+\node[ext] (cdn)  at (13.0,0) {\textbf{CDN (unpkg)}\\зовнішня мережа доставки бібліотеки Three.js};
+
+\draw[boundary] (-0.3,-1.45) rectangle (14.8,-7.7);
+\node[font=\scriptsize\itshape, anchor=north west] at (-0.15,-1.55)
+     {Система «Кімната 3D» (вебклієнт у браузері)};
+
+\node[cont]  (html) at (3.0,-3.4)  {\textbf{index.html, style.css}\\\textit{[HTML, CSS]}\\ розмітка вкладок, карта імпортів, тема};
+\node[cont]  (app)  at (8.5,-3.4)  {\textbf{app.js}\\\textit{[JavaScript, ES-модуль]}\\ стан, форми, 3D-сцена, взаємодія, розрахунки, збереження};
+\node[cont]  (dw)   at (13.0,-3.4) {\textbf{drywall.js}\\\textit{[JavaScript, чисті функції]}\\ розбиття, пул відрізків, розкрій ГКЛ};
+
+\node[cont]  (srv)  at (3.0,-6.4)  {\textbf{Статичний HTTP-сервер}\\\textit{[python -m http.server]}\\ видає файли застосунку};
+\node[store] (file) at (8.5,-6.4)  {\textbf{Файл проєкту}\\\textit{[JSON, локальна файлова система]}\\ збереження та імпорт};
+\node[cont]  (ut)   at (13.0,-6.4) {\textbf{utils.js}\\\textit{[JavaScript]}\\ round2, hexToNum, colorHex, clampv};
+
+\draw[flow]   (user) -- (html) node[lbl, midway] {браузер};
+\draw[flow]   (cdn)  -- (app)  node[lbl, pos=0.45] {importmap: Three.js};
+\draw[flow]   (srv)  -- (html) node[lbl, midway] {HTTP};
+\draw[flow]   (html) -- (app)  node[lbl, midway] {type=module};
+\draw[flow]   (app)  -- (dw)   node[lbl, midway] {planDrywall};
+\draw[biflow] (app)  -- (file) node[lbl, midway] {File System Access / Blob};
+\draw[flow]   (dw)   -- (ut)   node[lbl, midway] {import};
+\draw[flow]   (app)  -- (ut)   node[lbl, pos=0.35] {import};
+
+\end{tikzpicture}

@@ -1,0 +1,38 @@
+\usepackage{geometry}
+\IfFileExists{ukrainian.ldf}{%
+    \usepackage[ukrainian]{babel}%
+}{%
+    \usepackage{polyglossia}\setmainlanguage{ukrainian}%
+}
+\usepackage{fontspec}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{array}
+\usepackage{ragged2e}
+\usepackage{titlesec}
+\usepackage{indentfirst}
+\usepackage[titles]{tocloft}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{chngcntr}
+\usepackage{xltabular}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{color}
+\usepackage{hyperref}
+
+\usepackage{amsmath,amssymb}
+
+% Діаграми (TikZ) вбудовано безпосередньо в документ: окремої компіляції assets/*.tex не потрібно
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric, shapes.multipart, calc}
+% Шрифти лежать у проєкті (каталог fonts/): Liberation Serif метрично сумісний із Times New Roman і містить кирилицю;
+% так збірка не залежить від шрифтів, установлених у системі чи на Overleaf.
+\setmainfont{LiberationSerif}[Path=./fonts/, Extension=.ttf, UprightFont=*-Regular, BoldFont=*-Bold, ItalicFont=*-Italic, BoldItalicFont=*-BoldItalic]
+
+\hyphenpenalty=10000
+\exhyphenpenalty=10000
+\sloppy
+% Моноширинний шрифт з підтримкою кирилиці (для лістингів та промтів у додатках)
+\setmonofont{DejaVuSansMono}[Path=./fonts/, Extension=.ttf, UprightFont=*, BoldFont=*-Bold, Scale=0.85]

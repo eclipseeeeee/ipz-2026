@@ -1,0 +1,33 @@
+% Схема алгоритму розкрою гіпсокартону.
+% Фрагмент вбудовується в звіт командою \settikz; окремо не компілюється.
+\tikzset{
+    blk/.style={draw, thick, rounded corners=2pt, align=center, font=\footnotesize, text width=6.2cm, minimum height=0.95cm, fill=black!3},
+    dec/.style={draw, thick, diamond, aspect=2.6, align=center, font=\scriptsize, inner sep=0pt, text width=3.0cm, fill=black!8},
+    term/.style={draw, thick, rounded corners=8pt, align=center, font=\footnotesize, minimum width=3cm, minimum height=0.8cm, fill=black!10},
+    ar/.style={semithick, -{Latex[length=2.2mm]}},
+    lb/.style={font=\scriptsize, fill=white, inner sep=1pt}
+}
+\begin{tikzpicture}[node distance=0.7cm]
+\node[term] (s) {Початок: поверхні, розмір листа, режим};
+\node[dec, below=of s] (d0) {Режим «Економія»?};
+\node[blk, below=of d0] (a) {Розбиття поверхонь на плитки (орієнтація, шаховий порядок); перетин плиток з отворами};
+\node[blk, below=of a] (b) {Прохід 1: цілі плити~-- нові листи; вирізки отворів до пулу відрізків};
+\node[blk, below=of b] (c) {Прохід 2: крайові плитки за спаданням площі; відрізок із пулу (best-fit) або новий лист і гільйотинний розріз};
+\node[dec, below=of c] (d1) {Використати залишки?};
+\node[blk, below=of d1] (e) {Прохід 3: скасування найменш використаних листів складанням зі шматків (\texttt{coverRect})};
+\node[blk, below=of e] (f) {Нумерація плит, список залишків, підсумок};
+\node[term, below=of f] (t) {Кінець: план розкладки};
+\node[blk, right=2.2cm of d0, text width=4.6cm] (econ) {Режим «Економія»: вирізати отвори, нарізати області трьома стратегіями, упакувати за спаданням площі, обрати кращу стратегію};
+
+\draw[ar] (s)--(d0);
+\draw[ar] (d0)--node[lb,right]{ні}(a);
+\draw[ar] (d0.east)--node[lb,above]{так}(econ.west);
+\draw[ar] (a)--(b);
+\draw[ar] (b)--(c);
+\draw[ar] (c)--(d1);
+\draw[ar] (d1)--node[lb,right]{так}(e);
+\draw[ar] (e)--(f);
+\draw[ar] (f)--(t);
+\draw[ar] (d1.east)--++(1.2,0) node[lb,above,pos=0.5]{ні} |- (f.east);
+\draw[ar] (econ.south) -- ++(0,-1.2) -| ([xshift=0.6cm]f.east) -- (f.east);
+\end{tikzpicture}

@@ -1,0 +1,41 @@
+\documentclass[14pt,a4paper]{extarticle}
+
+\input{preamble/packages}
+\input{preamble/headings}
+\input{preamble/layout}
+\input{preamble/macros}
+\input{preamble/styles}
+\input{preamble/practice}
+
+\begin{document}
+    % Титульна сторінка
+    \makepracticetitlepage
+    {МІНІСТЕРСТВО ОСВІТИ І НАУКИ УКРАЇНИ}
+    {НАЦІОНАЛЬНИЙ УНІВЕРСИТЕТ ВОДНОГО ГОСПОДАРСТВА ТА ПРИРОДОКОРИСТУВАННЯ}
+    {Кафедра інженерії програмного забезпечення та штучного інтелекту}
+    {кафедра інженерії програмного забезпечення \\ та штучного інтелекту НУВГП}
+    {Вебзастосунок для автоматизованого розрахунку та моделювання внутрішньобудинкової електромережі}
+    {ІПЗ-61м}
+    {Сергійчук С. М.}
+    {доцент кафедри інженерії програмного \\ забезпечення та штучного інтелекту, \\ к.т.н., доцент Жуковський В. В.}
+    {Демчук О. С.}
+
+    \setcounter{page}{2}
+    \pagestyle{fancy}
+
+    % Календарний план (до змісту не включається)
+    \include{sections/01_schedule}
+
+    % Зміст
+    \clearpage
+    \begin{spacing}{1.25}
+    \tableofcontents
+    \end{spacing}
+
+    % Основна частина
+    \include{sections/01b_intro}
+    \include{sections/02_section}
+    \include{sections/03_section}
+    \include{sections/04_conclusions}
+    \include{sections/05_list-of-references}
+\end{document}

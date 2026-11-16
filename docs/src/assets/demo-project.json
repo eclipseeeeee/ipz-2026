@@ -1,0 +1,60 @@
+{
+  "app": "room-3d",
+  "version": 2,
+  "rooms": [
+    {"id": "r-1", "name": "Вітальня", "x": 0, "z": 0, "width": 5, "length": 4, "height": 2.7, "floor": 0,
+     "thickness": {"north": 0.1, "south": 0.1, "east": 0.1, "west": 0.1}},
+    {"id": "r-2", "name": "Кухня", "x": 4.6, "z": 0, "width": 4, "length": 4, "height": 2.7, "floor": 0.15,
+     "thickness": {"north": 0.1, "south": 0.1, "east": 0.1, "west": 0.1}}
+  ],
+  "activeRoom": "r-1",
+  "room": {
+    "showCeiling": false, "gridStep": 0.5, "showWallGrid": true, "showDoorLabels": false,
+    "showDims": false, "showDoorRuler": false, "showDrywall": false, "showLeftovers": true,
+    "useLeftovers": true, "dwOrient": "auto", "dwStagger": true,
+    "wallColor": 9684477, "wallOpaque": false, "wallImage": null, "floorColor": 4671304
+  },
+  "doors": [
+    {"type": "door", "room": "r-1", "wall": "south", "side": "left", "offset": 0.5, "width": 0.9, "height": 2.1,
+     "casing": 0.07, "radius": 0, "hinge": "left", "openDir": "in", "openAngle": 90, "reveal": 0.2,
+     "threshold": 0, "inset": 0, "color": 16747520, "casingColor": 16747520, "image": null},
+    {"type": "arch", "room": "r-1", "wall": "west", "side": "left", "offset": 1.55, "width": 0.9, "height": 2.1,
+     "casing": 0, "radius": 0.45, "hinge": "left", "openDir": "in", "openAngle": 90, "reveal": 0.1,
+     "threshold": 0, "inset": 0, "color": 16747520, "casingColor": 16747520, "image": null},
+    {"type": "arch", "room": "r-2", "wall": "east", "side": "left", "offset": 1.55, "width": 0.9, "height": 2.1,
+     "casing": 0, "radius": 0.45, "hinge": "left", "openDir": "in", "openAngle": 90, "reveal": 0.1,
+     "threshold": 0.15, "inset": 0, "color": 16747520, "casingColor": 16747520, "image": null}
+  ],
+  "elements": [
+    {"id": "e-1",  "type": "panel",    "room": "r-1", "wall": "south", "side": "left", "offset": 2.4, "elevation": 1.5},
+    {"id": "e-2",  "type": "switch2",  "room": "r-1", "wall": "south", "side": "left", "offset": 1.6, "elevation": 0.9},
+    {"id": "e-3",  "type": "socket",   "room": "r-1", "wall": "north", "side": "left", "offset": 1,   "elevation": 0.3},
+    {"id": "e-4",  "type": "socket2",  "room": "r-1", "wall": "north", "side": "left", "offset": 3,   "elevation": 0.3},
+    {"id": "e-5",  "type": "socket3",  "room": "r-1", "wall": "east",  "side": "left", "offset": 1,   "elevation": 0.3},
+    {"id": "e-6",  "type": "combo",    "room": "r-1", "wall": "east",  "side": "left", "offset": 3,   "elevation": 0.9},
+    {"id": "e-7",  "type": "junction", "room": "r-1", "wall": "north", "side": "left", "offset": 2,   "elevation": 2.4},
+    {"id": "e-8",  "type": "wireout",  "room": "r-1", "wall": "north", "side": "left", "offset": 4.5, "elevation": 2.0},
+    {"id": "e-9",  "type": "socket3",  "room": "r-2", "wall": "north", "side": "left", "offset": 0.5, "elevation": 1.1},
+    {"id": "e-10", "type": "socket2",  "room": "r-2", "wall": "north", "side": "left", "offset": 2,   "elevation": 1.1},
+    {"id": "e-11", "type": "switch",   "room": "r-2", "wall": "east",  "side": "left", "offset": 0.5, "elevation": 0.9}
+  ],
+  "wires": [
+    {"from": "e-1", "to": "e-7", "ceiling": true,  "cable": "power", "cores": 3, "diam": 6, "lane": 0, "points": []},
+    {"from": "e-7", "to": "e-3", "ceiling": false, "cable": "power", "cores": 3, "diam": 6, "lane": 0, "points": []},
+    {"from": "e-2", "to": "lt-1", "ceiling": false, "cable": "power", "cores": 3, "diam": 6, "lane": 0, "points": []},
+    {"from": "e-1", "to": "e-9", "ceiling": false, "cable": "power", "cores": 3, "diam": 6, "lane": 0, "points": []},
+    {"from": "e-1", "to": "e-5", "ceiling": false, "cable": "utp",   "cores": 8, "diam": 6, "lane": 0, "points": []},
+    {"from": "e-1", "to": "e-8", "ceiling": true,  "cable": "fiber", "cores": 2, "diam": 3, "lane": 0, "points": []}
+  ],
+  "lights": [
+    {"id": "lt-1", "mount": "ceiling", "room": "r-1", "x": 2.5, "z": 2},
+    {"id": "lt-2", "mount": "wall",    "room": "r-1", "wall": "north", "side": "left", "offset": 4, "elevation": 2},
+    {"id": "lt-3", "mount": "ceiling", "room": "r-2", "x": 2, "z": 2}
+  ],
+  "wallObjects": [
+    {"type": "picture", "room": "r-1", "wall": "north", "side": "left", "offset": 2.5, "elevation": 1.5,
+     "width": 0.6, "height": 0.8, "color": 9132587, "image": null},
+    {"type": "mirror",  "room": "r-2", "wall": "south", "side": "left", "offset": 2,   "elevation": 1.5,
+     "width": 0.6, "height": 0.8, "color": 9132587, "image": null}
+  ]
+}

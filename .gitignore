@@ -1,0 +1,30 @@
+﻿# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+
+# Claude Code (локальні налаштування сесій)
+.claude/settings.local.json
+
+# LaTeX: проміжні файли збірки
+*.aux
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.synctex.gz
+*.xdv
+build/
+docs/src/main.pdf
+
+# Python
+__pycache__/
+*.pyc

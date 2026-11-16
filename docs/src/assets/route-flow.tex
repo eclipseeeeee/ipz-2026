@@ -1,0 +1,30 @@
+% Схема алгоритму ортогонального трасування проводу.
+% Фрагмент вбудовується в звіт командою \settikz; окремо не компілюється.
+\tikzset{
+    blk/.style={draw, thick, rounded corners=2pt, align=center, font=\footnotesize, text width=5.4cm, minimum height=0.95cm, fill=black!3},
+    dec/.style={draw, thick, diamond, aspect=2.6, align=center, font=\scriptsize, inner sep=0pt, text width=3.4cm, fill=black!8},
+    term/.style={draw, thick, rounded corners=8pt, align=center, font=\footnotesize, minimum width=3cm, minimum height=0.8cm, fill=black!10},
+    ar/.style={semithick, -{Latex[length=2.2mm]}},
+    lb/.style={font=\scriptsize, fill=white, inner sep=1pt}
+}
+\begin{tikzpicture}[node distance=0.7cm]
+\node[term] (s) {Початок: вузли $P$ і $Q$ проводу};
+\node[blk, below=of s] (a) {Визначити поверхню та кімнату кожного вузла};
+\node[dec, below=of a] (d1) {Одна кімната, одна стіна, без примусу «через стелю»?};
+\node[blk, below=of d1] (b) {Рівень прокладання $c_y=\min(F_P+h_P,\,F_Q+h_Q)-0{,}02$ м};
+\node[blk, below=of b] (c) {Підйом від $P$ до рівня $c_y$ (якщо $P_y\neq c_y$)};
+\node[blk, below=of c] (d) {Перегин у точці $(Q_x,c_y,P_z)$ (якщо $\Delta x\neq0$ і $\Delta z\neq0$)};
+\node[blk, below=of d] (e) {Горизонталь до $(Q_x,c_y,Q_z)$ і спуск до $Q$};
+\node[term, below=of e] (t) {Кінець: ламана з прямими кутами та її довжина};
+\node[blk, right=2.4cm of d1, text width=4.0cm] (l) {Маршрут «Г»: горизонталь на висоті $P$, далі вертикаль до $Q$};
+
+\draw[ar] (s)--(a);
+\draw[ar] (a)--(d1);
+\draw[ar] (d1)--node[lb,right]{ні}(b);
+\draw[ar] (b)--(c);
+\draw[ar] (c)--(d);
+\draw[ar] (d)--(e);
+\draw[ar] (e)--(t);
+\draw[ar] (d1.east)--node[lb,above]{так}(l.west);
+\draw[ar] (l.south) |- (t.east);
+\end{tikzpicture}
